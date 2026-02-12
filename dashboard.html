@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Logístico</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- LIBRERÍAS -->
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.29/dist/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+:root{
+ --bg:#f8fafc;--card:#ffffff;--txt:#0f172a;
+ --muted:#64748b;--pri:#14b8a6;--pri-dark:#0d9488;
+ --border:#cbd5e1;
+}
+*{box-sizing:border-box}
+body{font-family:Inter,Arial;background:var(--bg);color:var(--txt);padding:16px}
+
+/* HEADER */
+.topbar{margin-bottom:12px}
+
+/* KPIS */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,120px);gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border-radius:16px;padding:10px;text-align:center;box-shadow:0 4px 12px #0001}
+.kpi canvas{width:90px!important;height:90px!important}
+
+/* FILTROS */
+.filters{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+ margin-bottom:12px
+}
+input,select{
+ padding:10px 12px;
+ border-radius:12px;
+ border:1px solid var(--border);
+ font-size:14px
+}
+
+/* BOTONES + LOADER */
+button{
+ position:relative;
+ padding:10px 14px;
+ border-radius:12px;
+ border:0;
+ background:var(--pri);
+ color:#fff;
+ font-weight:600;
+ cursor:pointer;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:8px;
+}
+button:disabled{opacity:.7;cursor:not-allowed}
+.btn-text{display:inline}
+.btn-loader{
+ display:none;
+ width:18px;height:18px;
+ border:3px solid #fff7;
+ border-top:3px solid #fff;
+ border-radius:50%;
+ animation:spin .8s linear infinite;
+}
+button.loading .btn-text{display:none}
+button.loading .btn-loader{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TABLA DESKTOP */
+table{
+ width:100%;border-collapse:collapse;background:var(--card);
+ border-radius:16px;overflow:hidden;box-shadow:0 8px 24px #0001
+}
+th,td{padding:10px;border-bottom:1px solid var(--border)}
+th{color:var(--muted);text-align:left}
+tbody tr{transition:.25s}
+tbody tr:hover{box-shadow:0 8px 22px #0002;transform:translateY(-2px)}
+.actions button{font-size:16px}
+
+/* MOBILE */
+.mobile-list{display:none}
+.row-card{
+ background:var(--card);
+ border-radius:18px;
+ padding:14px;
+ box-shadow:0 6px 18px #0001;
+ transition:.3s;
+ margin-bottom:12px
+}
+.row-actions{display:flex;gap:10px;margin-top:10px}
+.row-actions button{flex:1;font-size:18px}
+
+/* MODALES */
+.modal{
+ position:fixed;inset:0;background:#0006;
+ display:none;align-items:center;justify-content:center;
+ z-index:1000
+}
+.modal-content{
+ background:var(--card);
+ padding:20px;
+ border-radius:18px;
+ width:340px;
+ max-width:95%
+}
+
+@media(max-width:768px){
+ table{display:none}
+ .mobile-list{display:block}
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+ <h2>🚚 Dashboard Logístico</h2>
+</div>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="filters">
+ <input id="search" placeholder="Buscar pedido o cliente" oninput="applyFilters()">
+
+ <input type="date" id="fDesde" onchange="applyFilters()">
+ <input type="date" id="fHasta" onchange="applyFilters()">
+
+ <select id="fComuna" onchange="applyFilters()">
+  <option value="">Todas</option>
+ </select>
+
+ <select id="fStatus" onchange="applyFilters()">
+  <option value="">Todos</option>
+  <option>PENDIENTE</option>
+  <option>EN RUTA</option>
+  <option>ENTREGADO</option>
+  <option>CANCELADO</option>
+ </select>
+
+ <button onclick="openModal()">
+  <span class="btn-text">➕ Nuevo</span>
+ </button>
+
+ <button onclick="exportPDF(this)">
+  <span class="btn-text">📄 PDF</span>
+  <span class="btn-loader"></span>
+ </button>
+
+ <button onclick="exportExcel(this)">
+  <span class="btn-text">📊 Excel</span>
+  <span class="btn-loader"></span>
+ </button>
+</div>
+
+<!-- TABLA DESKTOP -->
+<table>
+<thead>
+<tr>
+ <th>Fecha</th><th>Pedido</th><th>Cliente</th><th>Dirección</th>
+ <th>Comuna</th><th>Cajas</th><th>Obs</th><th>Estado</th><th>Acciones</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<!-- MOBILE -->
+<div class="mobile-list" id="mobileList"></div>
+
+<!-- MODAL FORM -->
+<div class="modal" id="modal">
+ <div class="modal-content">
+  <h3 id="mtitle">Nuevo</h3>
+  <input id="mPedido" placeholder="Pedido">
+  <input id="mCliente" placeholder="Cliente">
+  <input id="mDireccion" placeholder="Dirección">
+  <input id="mComuna" placeholder="Comuna">
+  <input id="mCajas" type="number" placeholder="Cajas">
+  <select id="mStatus">
+   <option>PENDIENTE</option>
+   <option>EN RUTA</option>
+   <option>ENTREGADO</option>
+   <option>CANCELADO</option>
+  </select>
+  <input id="mObs" placeholder="Observaciones">
+  <br><br>
+  <button onclick="save(this)">
+   <span class="btn-text">💾 Guardar</span>
+   <span class="btn-loader"></span>
+  </button>
+  <button onclick="closeModal()">❌ Cancelar</button>
+ </div>
+</div>
+
+<!-- MODAL MAPA -->
+<div class="modal" id="mapModal">
+ <div class="modal-content" style="width:95%;height:80vh;padding:0">
+  <div style="text-align:right;padding:8px">
+   <button onclick="closeMap()">❌ Cerrar</button>
+  </div>
+  <iframe id="mapFrame" style="width:100%;height:100%;border:0"></iframe>
+ </div>
+</div>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbyc5sAJT8i5gbJPaMtFkAVkm56TxOVyAnHmMPj6wMnTzqxFZiTnU7KoKXsvS2Nblq8bnA/exec";
+let RAW=[],FILT=[],EDIT=null,charts={};
+const isMobile=()=>window.matchMedia("(max-width:768px)").matches;
+
+/* LOADER */
+function setLoading(btn,state){
+ if(!btn)return;
+ btn.disabled=state;
+ btn.classList.toggle("loading",state);
+}
+
+/* FILTROS (INCLUYE FECHA) */
+function applyFilters(){
+ const q=search.value.toLowerCase();
+ const c=fComuna.value;
+ const s=fStatus.value;
+ const dDesde=fDesde.value?new Date(fDesde.value):null;
+ const dHasta=fHasta.value?new Date(fHasta.value):null;
+
+ FILT=RAW.filter(r=>{
+  const textoOK=!q||(r.pedido+r.cliente).toLowerCase().includes(q);
+  const comunaOK=!c||r.comuna===c;
+  const statusOK=!s||r.status===s;
+
+  let fechaOK=true;
+  if(dDesde||dHasta){
+   const fr=new Date(r.fechaIngreso);
+   if(dDesde && fr<dDesde) fechaOK=false;
+   if(dHasta && fr>dHasta) fechaOK=false;
+  }
+  return textoOK && comunaOK && statusOK && fechaOK;
+ });
+ render();
+}
+
+/* RENDER */
+function render(){
+ renderKPIs();
+ tbody.innerHTML='';
+ mobileList.innerHTML='';
+
+ if(isMobile()){
+  FILT.forEach(r=>{
+   mobileList.innerHTML+=`
+   <div class="row-card">
+    <b>${r.pedido}</b> · ${r.status}<br>
+    ${r.cliente}<br>
+    ${r.direccion} (${r.comuna})<br>
+    📦 ${r.etiquetas||0}
+    <div class="row-actions">
+     <button onclick="openMap('${r.direccion}','${r.comuna}')">📍</button>
+     <button onclick="openModal(RAW.find(x=>x._row==${r._row}))">✏️</button>
+     <button onclick="delRow(${r._row},this)">🗑️</button>
+    </div>
+   </div>`;
+  });
+ }else{
+  FILT.forEach(r=>{
+   tbody.innerHTML+=`
+   <tr>
+    <td>${r.fechaIngreso}</td>
+    <td>${r.pedido}</td>
+    <td>${r.cliente}</td>
+    <td>${r.direccion}</td>
+    <td>${r.comuna}</td>
+    <td>${r.etiquetas||0}</td>
+    <td>${r.observaciones||''}</td>
+    <td>${r.status}</td>
+    <td class="actions">
+     <button onclick="openModal(RAW.find(x=>x._row==${r._row}))">✏️</button>
+     <button onclick="openMap('${r.direccion}','${r.comuna}')">📍</button>
+     <button onclick="delRow(${r._row},this)">🗑️</button>
+    </td>
+   </tr>`;
+  });
+ }
+}
+
+/* KPIS */
+function drawKPI(id,val,total,color){
+ if(charts[id])charts[id].destroy();
+ charts[id]=new Chart(document.getElementById(id),{
+  type:'doughnut',
+  data:{datasets:[{data:[val,total-val],backgroundColor:[color,'#e5e7eb']}]},
+  options:{cutout:'70%',plugins:{legend:{display:false}}}
+ });
+}
+function renderKPIs(){
+ const t=FILT.length;
+ const c=s=>FILT.filter(r=>r.status===s).length;
+ kpis.innerHTML=`
+ <div class="kpi"><canvas id="k1"></canvas><b>${t}</b><br>Total</div>
+ <div class="kpi"><canvas id="k2"></canvas><b>${c('PENDIENTE')}</b><br>Pend</div>
+ <div class="kpi"><canvas id="k3"></canvas><b>${c('EN RUTA')}</b><br>Ruta</div>
+ <div class="kpi"><canvas id="k4"></canvas><b>${c('ENTREGADO')}</b><br>OK</div>`;
+ drawKPI("k1",t,t,"#14b8a6");
+ drawKPI("k2",c("PENDIENTE"),t,"#facc15");
+ drawKPI("k3",c("EN RUTA"),t,"#38bdf8");
+ drawKPI("k4",c("ENTREGADO"),t,"#4ade80");
+}
+
+/* CRUD */
+function openModal(r=null){
+ modal.style.display='flex';EDIT=r;
+ if(r){
+  mtitle.textContent='Editar';
+  mPedido.value=r.pedido;
+  mCliente.value=r.cliente;
+  mDireccion.value=r.direccion;
+  mComuna.value=r.comuna;
+  mCajas.value=r.etiquetas||1;
+  mObs.value=r.observaciones||'';
+  mStatus.value=r.status;
+ }else{
+  mtitle.textContent='Nuevo';
+  mPedido.value=mCliente.value=mDireccion.value=mComuna.value=mObs.value='';
+  mCajas.value=1;mStatus.value='PENDIENTE';
+ }
+}
+function closeModal(){modal.style.display='none'}
+
+async function save(btn){
+ setLoading(btn,true);
+ const p={
+  action:EDIT?'update':'add',
+  row:EDIT?EDIT._row:null,
+  PEDIDO:mPedido.value,
+  CLIENTE:mCliente.value,
+  DIRECCION:mDireccion.value,
+  COMUNA:mComuna.value,
+  ETIQUETAS:mCajas.value,
+  OBSERVACIONES:mObs.value,
+  STATUS:mStatus.value
+ };
+ await fetch(API,{method:'POST',body:JSON.stringify(p)});
+ setLoading(btn,false);
+ closeModal();load();
+}
+
+async function delRow(row,btn){
+ if(!confirm("¿Eliminar registro?"))return;
+ setLoading(btn,true);
+ await fetch(API,{method:'POST',body:JSON.stringify({action:'delete',row})});
+ setLoading(btn,false);
+ load();
+}
+
+/* MAPA */
+function openMap(d,c){
+ mapFrame.src=`https://www.google.com/maps?q=${encodeURIComponent(d+', '+c+', Chile')}&output=embed`;
+ mapModal.style.display='flex';
+}
+function closeMap(){mapModal.style.display='none';mapFrame.src=''}
+
+/* EXPORTES */
+function exportPDF(btn){
+  setLoading(btn,true);
+
+  setTimeout(()=>{
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'landscape' });
+
+    // ===== CALCULOS =====
+    const totalPedidos = FILT.length;
+    const totalBultos = FILT.reduce((sum,r)=> sum + Number(r.etiquetas||0), 0);
+
+    // ===== TABLA =====
+    doc.autoTable({
+      head:[[ 
+        'Fecha','Pedido','Cliente','Dirección',
+        'Comuna','Cajas','Obs','Estado'
+      ]],
+      body: FILT.map(r=>[
+        r.fechaIngreso,
+        r.pedido,
+        r.cliente,
+        r.direccion,
+        r.comuna,
+        r.etiquetas || 0,
+        r.observaciones || '',
+        r.status
+      ]),
+      foot: [[
+        '','','','','',
+        `TOTAL BULTOS: ${totalBultos}`,
+        '',
+        `TOTAL PEDIDOS: ${totalPedidos}`
+      ]],
+      footStyles:{
+        fontStyle:'bold',
+        fontSize:12,
+        halign:'right'
+      },
+      styles:{
+        fontSize:10
+      },
+      margin:{ top:20 }
+    });
+
+    doc.save("Pedidos.pdf");
+    setLoading(btn,false);
+  },300);
+}
+
+function exportExcel(btn){
+ setLoading(btn,true);
+ setTimeout(()=>{
+  const ws=XLSX.utils.json_to_sheet(FILT);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Pedidos");
+  XLSX.writeFile(wb,"Pedidos.xlsx");
+  setLoading(btn,false);
+ },300);
+}
+
+/* LOAD */
+async function load(){
+ const r=await fetch(API);
+ RAW=await r.json();
+ fComuna.innerHTML='<option value="">Todas</option>'+
+ [...new Set(RAW.map(x=>x.comuna))].map(c=>`<option>${c}</option>`).join('');
+ applyFilters();
+}
+load();
+</script>
+<script src="segurity.js"></script>
+</body>
+</html>
