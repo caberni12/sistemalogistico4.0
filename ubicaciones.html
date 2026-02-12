@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sistema de Ubicaciones PRO</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<style>
+:root{
+  --verde:#16A34A;
+  --turquesa:#14B8A6;
+  --gris:#F3F4F6;
+  --texto:#1F2937;
+  --borde:#D1D5DB;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--gris);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont;
+  color:var(--texto);
+}
+
+/* ===== HEADER ===== */
+header{
+  background:#fff;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+}
+
+header b{
+  font-size:18px;
+}
+
+/* ===== TABS ===== */
+.tabs{
+  display:flex;
+  gap:8px;
+  padding:12px;
+}
+
+.tabs button{
+  flex:1;
+  border:none;
+  padding:12px;
+  border-radius:12px;
+  background:#fff;
+  font-weight:600;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+}
+
+.tabs button.active{
+  background:var(--verde);
+  color:#fff;
+}
+
+/* ===== CARD ===== */
+.card{
+  background:#fff;
+  margin:12px;
+  padding:16px;
+  border-radius:16px;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+
+/* ===== INPUTS ===== */
+.label{
+  font-size:13px;
+  font-weight:600;
+  margin:12px 0 4px;
+}
+
+.input-scan{
+  display:flex;
+  gap:8px;
+}
+
+.input-scan input{
+  flex:1;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid var(--borde);
+  font-size:15px;
+}
+
+.scan-btn{
+  width:48px;
+  border:none;
+  border-radius:12px;
+  background:var(--turquesa);
+  color:#fff;
+  font-size:20px;
+}
+
+input[readonly]{
+  background:#F9FAFB;
+}
+
+/* ===== BOTONES ===== */
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:16px;
+}
+
+.btn-green{
+  background:var(--verde);
+  color:#fff;
+  border:none;
+  padding:14px;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:600;
+}
+
+.btn-turq{
+  background:var(--turquesa);
+  color:#fff;
+  border:none;
+  padding:14px;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:600;
+}
+
+.btn-gray{
+  background:#E5E7EB;
+  border:none;
+  padding:14px;
+  border-radius:14px;
+  font-weight:600;
+}
+
+/* ===== LISTA ===== */
+.list{
+  margin-top:12px;
+}
+
+.item{
+  background:#F9FAFB;
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:10px;
+}
+
+.item .top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.badge{
+  background:var(--verde);
+  color:#fff;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+}
+
+.stock{
+  font-size:22px;
+  font-weight:700;
+}
+
+/* ===== MODAL ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal.active{display:flex}
+
+.modal-card{
+  background:#fff;
+  width:90%;
+  max-width:420px;
+  border-radius:18px;
+  padding:16px;
+}
+
+.modal-card h3{
+  margin:0 0 12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <b>📍 Ubicaciones PRO</b>
+  <span>✔️</span>
+</header>
+
+<!-- ===== TABS ===== -->
+<div class="tabs">
+  <button class="active" onclick="openTab('ingreso',this)">Ingreso</button>
+  <button onclick="openTab('traslado',this)">Traslado</button>
+  <button onclick="openTab('consulta',this)">Consulta</button>
+</div>
+
+<!-- ===== INGRESO ===== -->
+<div id="ingreso" class="card tab">
+
+  <div class="label">Ubicación</div>
+  <div class="input-scan">
+    <input id="ubi_ing" placeholder="Escanear ubicación">
+    <button class="scan-btn">📷</button>
+  </div>
+
+  <div class="label">Producto</div>
+  <div class="input-scan">
+    <input id="cod_ing" placeholder="Escanear producto">
+    <button class="scan-btn">📷</button>
+  </div>
+
+  <div class="label">Descripción</div>
+  <input id="desc_ing" readonly placeholder="Descripción automática">
+
+  <div class="label">Cantidad</div>
+  <input id="cant_ing" type="number" value="1">
+
+  <div class="actions">
+    <button class="btn-green" onclick="guardarIngreso()">Guardar</button>
+    <button class="btn-gray" onclick="limpiar()">Limpiar</button>
+  </div>
+
+</div>
+
+<!-- ===== TRASLADO ===== -->
+<div id="traslado" class="card tab" style="display:none">
+
+  <div class="label">Ubicación Origen</div>
+  <input id="ori" placeholder="Escanear origen">
+
+  <div class="label">Ubicación Destino</div>
+  <input id="des" placeholder="Escanear destino">
+
+  <div class="label">Producto</div>
+  <input id="cod_tra" placeholder="Escanear producto">
+
+  <div class="label">Cantidad</div>
+  <input id="cant_tra" type="number" value="1">
+
+  <div class="actions">
+    <button class="btn-turq" onclick="guardarTraslado()">Confirmar</button>
+    <button class="btn-gray" onclick="limpiar()">Cancelar</button>
+  </div>
+
+</div>
+
+<!-- ===== CONSULTA ===== -->
+<div id="consulta" class="card tab" style="display:none">
+
+  <input placeholder="Buscar ubicación o producto">
+
+  <div class="list">
+
+    <div class="item">
+      <div class="top">
+        <b>BCI201</b>
+        <span class="badge">VIGENTE</span>
+      </div>
+      <div>BASTÓN RETRÁCTIL BREMEN</div>
+      <div class="stock">960</div>
+    </div>
+
+    <div class="item">
+      <div class="top">
+        <b>PKL06</b>
+        <span class="badge">VIGENTE</span>
+      </div>
+      <div>BOTÍN SEGURIDAD</div>
+      <div class="stock">54</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== MODAL CONFIRMACIÓN ===== -->
+<div id="modal" class="modal">
+  <div class="modal-card">
+    <h3>✔️ Confirmado</h3>
+    <p>Movimiento registrado correctamente</p>
+    <button class="btn-green" onclick="cerrarModal()">Aceptar</button>
+  </div>
+</div>
+
+<script>
+function openTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
+  document.getElementById(id).style.display='block';
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function guardarIngreso(){
+  document.getElementById('modal').classList.add('active');
+}
+
+function guardarTraslado(){
+  document.getElementById('modal').classList.add('active');
+}
+
+function cerrarModal(){
+  document.getElementById('modal').classList.remove('active');
+}
+
+function limpiar(){
+  document.querySelectorAll('input').forEach(i=>i.value='');
+}
+</script>
+
+</body>
+</html>
