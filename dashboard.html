@@ -302,7 +302,11 @@ function renderKPIs(){
  kpis.innerHTML=`
  <div class="kpi"><canvas id="k1"></canvas><b>${t}</b><br>Total</div>
  <div class="kpi"><canvas id="k2"></canvas><b>${c('PENDIENTE')}</b><br>Pend</div>
- <div class="kpi"><canvas id="k3"></canvas><b>${c('EN RUTA')}</b><br>Ruta</div>
+ 
+<div class="kpi"><canvas id="k3"></canvas><b>${c('EN RUTA')}</b><br>Ruta</div>
+
+<div class="kpi"><canvas id="k3"></canvas><b>${c('CANCELADO')}</b><br>Cancelado</div>
+
 <div class="kpi"><canvas id="k5"></canvas><b>${c('RECIBIDO')}</b><br>Recibido</div>
 
  <div class="kpi"><canvas id="k4"></canvas><b>${c('ENTREGADO')}</b><br>Entregado</div>`;
@@ -312,8 +316,9 @@ function renderKPIs(){
  drawKPI("k2",c("PENDIENTE"),t,"#facc15");
  drawKPI("k3",c("EN RUTA"),t,"#38bdf8");
  drawKPI("k4",c("ENTREGADO"),t,"#4ade80");
- drawKPI("k5",c("RECIBIDO"),t,"#4ade80")
-}
+ drawKPI("k5",c("RECIBIDO"),t,"#4ade80");
+ drawKPI("k5",c("CANCELADO"),t,"#38bdf8")
+
 
 /* CRUD */
 function openModal(r=null){
