@@ -140,6 +140,7 @@ tbody tr:hover{box-shadow:0 8px 22px #0002;transform:translateY(-2px)}
   <option>EN RUTA</option>
   <option>ENTREGADO</option>
   <option>CANCELADO</option>
+  <option>RECIBIDO</option>
  </select>
 
  <button onclick="openModal()">
@@ -185,6 +186,7 @@ tbody tr:hover{box-shadow:0 8px 22px #0002;transform:translateY(-2px)}
    <option>EN RUTA</option>
    <option>ENTREGADO</option>
    <option>CANCELADO</option>
+   <option>RECIBIDO</option>
   </select>
   <input id="mObs" placeholder="Observaciones">
   <br><br>
@@ -301,11 +303,16 @@ function renderKPIs(){
  <div class="kpi"><canvas id="k1"></canvas><b>${t}</b><br>Total</div>
  <div class="kpi"><canvas id="k2"></canvas><b>${c('PENDIENTE')}</b><br>Pend</div>
  <div class="kpi"><canvas id="k3"></canvas><b>${c('EN RUTA')}</b><br>Ruta</div>
+<div class="kpi"><canvas id="k5"></canvas><b>${c('RECIBIDO')}</b><br>Ruta</div>
+
  <div class="kpi"><canvas id="k4"></canvas><b>${c('ENTREGADO')}</b><br>OK</div>`;
+
+
  drawKPI("k1",t,t,"#14b8a6");
  drawKPI("k2",c("PENDIENTE"),t,"#facc15");
  drawKPI("k3",c("EN RUTA"),t,"#38bdf8");
  drawKPI("k4",c("ENTREGADO"),t,"#4ade80");
+ drawKPI("k5",c("RECIBIDO"),t,"#4ade80")
 }
 
 /* CRUD */
