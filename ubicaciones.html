@@ -1,48 +1,53 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <title>Ubicaciones PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-<!-- SCANNER REAL -->
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
-:root{
-  --verde:#22c55e;
-  --turquesa:#14b8a6;
-  --blanco:#ffffff;
-  --fondo:#f1f5f9;
-  --texto:#0f172a;
-  --muted:#64748b;
-  --borde:#e5e7eb;
-  --sombra:0 12px 30px rgba(0,0,0,.12);
+/* ===== RESET REAL ===== */
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
 
-*{box-sizing:border-box}
+input,button{
+  font-family:inherit;
+  outline:none;
+}
 
+/* ===== VARIABLES ===== */
+:root{
+  --green:#22c55e;
+  --turq:#14b8a6;
+  --bg:#f4f6f8;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --shadow:0 12px 30px rgba(0,0,0,.12);
+}
+
+/* ===== BODY ===== */
 body{
   margin:0;
-  background:var(--fondo);
+  background:var(--bg);
   font-family:system-ui,-apple-system,BlinkMacSystemFont;
-  color:var(--texto);
+  color:var(--text);
 }
 
 /* ===== HEADER ===== */
 header{
-  background:var(--blanco);
+  background:var(--card);
   padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  box-shadow:var(--sombra);
-}
-
-header b{
+  font-weight:800;
   font-size:18px;
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
 /* ===== TABS ===== */
@@ -56,63 +61,64 @@ header b{
   flex:1;
   padding:14px;
   border:none;
-  border-radius:16px;
-  background:var(--blanco);
+  border-radius:18px;
+  background:var(--card);
   font-weight:700;
-  box-shadow:var(--sombra);
-  color:var(--texto);
+  box-shadow:var(--shadow);
 }
 
 .tabs button.active{
-  background:linear-gradient(135deg,var(--verde),var(--turquesa));
+  background:linear-gradient(135deg,var(--green),var(--turq));
   color:#fff;
 }
 
 /* ===== CARD ===== */
 .card{
-  background:var(--blanco);
+  background:var(--card);
   margin:14px;
   padding:18px;
   border-radius:22px;
-  box-shadow:var(--sombra);
+  box-shadow:var(--shadow);
 }
 
-/* ===== INPUTS ===== */
+/* ===== LABELS ===== */
 .label{
   margin-top:14px;
   font-size:13px;
-  font-weight:700;
+  font-weight:800;
   color:var(--muted);
 }
 
-.input-scan{
+/* ===== INPUTS ===== */
+.input-wrap{
   display:flex;
   gap:10px;
   margin-top:6px;
 }
 
-.input-scan input{
+.input-wrap input{
   flex:1;
   padding:16px;
-  border-radius:16px;
-  border:1px solid var(--borde);
   font-size:16px;
+  border-radius:18px;
+  border:2px solid #e5e7eb;
+  background:#fff;
+}
+
+.input-wrap input:focus{
+  border-color:var(--turq);
 }
 
 .scan-btn{
   width:56px;
   border:none;
-  border-radius:16px;
-  background:var(--turquesa);
+  border-radius:18px;
+  background:var(--turq);
   color:#fff;
   font-size:22px;
 }
 
-input[readonly]{
-  background:#f8fafc;
-}
-
-/* ===== BOTONES ===== */
+/* ===== ACTIONS ===== */
 .actions{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -125,85 +131,46 @@ input[readonly]{
   color:#fff;
   border:none;
   padding:16px;
-  border-radius:18px;
-  font-size:16px;
-  font-weight:800;
+  border-radius:20px;
+  font-weight:900;
 }
 
 .btn-gray{
   background:#e5e7eb;
   border:none;
   padding:16px;
-  border-radius:18px;
-  font-weight:700;
+  border-radius:20px;
+  font-weight:800;
 }
 
 /* ===== SCANNER ===== */
-#scanner{
+#scannerBox{
   margin-top:16px;
+  height:260px;
   border-radius:20px;
   overflow:hidden;
   display:none;
+  box-shadow:var(--shadow);
 }
 
-/* ===== LISTA ===== */
+/* ===== LIST ===== */
 .item{
   background:#f8fafc;
   padding:16px;
-  border-radius:18px;
+  border-radius:20px;
   margin-bottom:12px;
 }
 
-.item .top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.badge{
-  background:var(--verde);
-  color:#fff;
-  padding:6px 14px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:700;
-}
-
 .stock{
-  font-size:26px;
+  font-size:28px;
   font-weight:900;
-}
-
-/* ===== MODAL ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  display:none;
-  align-items:center;
-  justify-content:center;
-}
-
-.modal.active{display:flex}
-
-.modal-card{
-  background:#fff;
-  padding:20px;
-  border-radius:22px;
-  width:90%;
-  max-width:420px;
-  box-shadow:var(--sombra);
-  text-align:center;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <b>📍 Ubicaciones PRO</b>
-  <span>Demo</span>
-</header>
+<header>📍 Ubicaciones PRO</header>
 
 <div class="tabs">
   <button class="active" onclick="openTab('ingreso',this)">Ingreso</button>
@@ -214,27 +181,24 @@ input[readonly]{
 <div id="ingreso" class="card tab">
 
   <div class="label">Ubicación</div>
-  <div class="input-scan">
+  <div class="input-wrap">
     <input id="ubicacion" placeholder="Escanear ubicación">
     <button class="scan-btn" onclick="startScan('ubicacion')">📷</button>
   </div>
 
   <div class="label">Producto</div>
-  <div class="input-scan">
-    <input id="codigo" placeholder="Escanear producto">
-    <button class="scan-btn" onclick="startScan('codigo')">📷</button>
+  <div class="input-wrap">
+    <input id="producto" placeholder="Escanear producto">
+    <button class="scan-btn" onclick="startScan('producto')">📷</button>
   </div>
 
-  <div class="label">Descripción</div>
-  <input id="descripcion" readonly placeholder="Automática">
-
   <div class="label">Cantidad</div>
-  <input id="cantidad" type="number" value="1">
+  <input id="cantidad" type="number" value="1" style="margin-top:6px">
 
-  <div id="scanner"></div>
+  <div id="scannerBox"></div>
 
   <div class="actions">
-    <button class="btn-green" onclick="guardar()">Guardar</button>
+    <button class="btn-green">Guardar</button>
     <button class="btn-gray" onclick="limpiar()">Limpiar</button>
   </div>
 
@@ -242,30 +206,16 @@ input[readonly]{
 
 <!-- ===== CONSULTA ===== -->
 <div id="consulta" class="card tab" style="display:none">
-
   <div class="item">
-    <div class="top">
-      <b>BCI201</b>
-      <span class="badge">VIGENTE</span>
-    </div>
+    <b>BCI201</b>
     <div>BASTÓN RETRÁCTIL</div>
     <div class="stock">960</div>
-  </div>
-
-</div>
-
-<!-- ===== MODAL ===== -->
-<div id="modal" class="modal">
-  <div class="modal-card">
-    <h3>✔️ Guardado</h3>
-    <p>Movimiento registrado correctamente</p>
-    <button class="btn-green" onclick="closeModal()">Aceptar</button>
   </div>
 </div>
 
 <script>
-let html5QrCode;
-let targetInput=null;
+let scanner;
+let activeInput;
 
 function openTab(id,btn){
   document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
@@ -275,19 +225,19 @@ function openTab(id,btn){
 }
 
 function startScan(inputId){
-  targetInput=document.getElementById(inputId);
-  document.getElementById('scanner').style.display='block';
+  activeInput=document.getElementById(inputId);
+  document.getElementById('scannerBox').style.display='block';
 
-  if(!html5QrCode){
-    html5QrCode=new Html5Qrcode("scanner");
+  if(!scanner){
+    scanner=new Html5Qrcode("scannerBox");
   }
 
-  Html5Qrcode.getCameras().then(cameras=>{
-    html5QrCode.start(
-      cameras[0].id,
-      { fps:10, qrbox:250 },
+  Html5Qrcode.getCameras().then(cams=>{
+    scanner.start(
+      cams[0].id,
+      { fps:10, qrbox:220 },
       txt=>{
-        targetInput.value=txt;
+        activeInput.value=txt;
         stopScan();
       }
     );
@@ -295,18 +245,10 @@ function startScan(inputId){
 }
 
 function stopScan(){
-  if(html5QrCode){
-    html5QrCode.stop();
-    document.getElementById('scanner').style.display='none';
+  if(scanner){
+    scanner.stop();
+    document.getElementById('scannerBox').style.display='none';
   }
-}
-
-function guardar(){
-  document.getElementById('modal').classList.add('active');
-}
-
-function closeModal(){
-  document.getElementById('modal').classList.remove('active');
 }
 
 function limpiar(){
