@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,85 +6,140 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-/* ================= BASE ================= */
+/* ===================== BASE ===================== */
 body{
+  margin:0;
   font-family:'Segoe UI',Arial;
   background:#f4f7fb;
-  margin:0;
 }
 
 .container{
-  padding:40px;
-  max-width:1300px;
+  max-width:1400px;
   margin:auto;
+  padding:20px;
 }
 
 .card{
   background:#fff;
   border-radius:18px;
-  padding:30px;
+  padding:22px;
   box-shadow:0 15px 35px rgba(0,0,0,.08);
 }
 
-/* ================= CONTROLES ================= */
+/* ===================== CONTROLES ===================== */
 .controls{
   display:flex;
   gap:10px;
-  margin-bottom:20px;
   flex-wrap:wrap;
+  margin-bottom:20px;
 }
 
 .controls input{
   padding:10px;
   border-radius:8px;
   border:1px solid #ddd;
-  min-width:260px;
+  width:260px;
+  max-width:100%;
 }
 
 button{
-  padding:10px 16px;
   border:none;
   border-radius:10px;
+  padding:10px 16px;
   cursor:pointer;
   font-size:14px;
 }
 
-.btn-load{ background:#3b82f6; color:#fff; }
+.btn-primary{ background:#3b82f6; color:#fff; }
 .btn-success{ background:#10b981; color:#fff; }
 .btn-edit{ background:#6366f1; color:#fff; padding:6px 12px; }
 .btn-danger{ background:#ef4444; color:#fff; padding:6px 12px; }
 
-/* ================= LOADER ================= */
+/* ===================== LOADER ===================== */
 .loader{
   width:16px;
   height:16px;
-  border:3px solid rgba(255,255,255,.5);
+  border:3px solid rgba(255,255,255,.4);
   border-top:3px solid #fff;
   border-radius:50%;
   animation:spin .7s linear infinite;
 }
-@keyframes spin{ to{ transform:rotate(360deg); } }
 
-.btn-loading{
+@keyframes spin{ to{transform:rotate(360deg)} }
+
+.loading{
   pointer-events:none;
   opacity:.8;
   display:flex;
   align-items:center;
-  justify-content:center;
   gap:8px;
+  justify-content:center;
 }
 
-/* ================= TABLA ================= */
-table{ width:100%; border-collapse:collapse; }
-th{ background:#f1f5f9; padding:14px; }
-td{
+/* ===================== TABLA (WEB) ===================== */
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th{
+  background:#f1f5f9;
   padding:12px;
-  border-bottom:1px solid #eee;
-  text-align:center;
-  font-size:13px;
 }
 
-/* ================= MODAL ================= */
+td{
+  padding:10px;
+  border-bottom:1px solid #eee;
+  font-size:13px;
+  text-align:center;
+}
+
+/* ===================== MÓVIL ===================== */
+.mobile-list{ display:none; }
+
+@media(max-width:768px){
+
+  table, thead{ display:none; }
+
+  .controls input{ width:100%; }
+
+  .mobile-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .mobile-card{
+    background:#fff;
+    border-radius:16px;
+    padding:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    border:1px solid #e5e7eb;
+  }
+
+  .mobile-card h4{
+    margin:0 0 6px;
+    font-size:15px;
+  }
+
+  .mobile-card p{
+    margin:4px 0;
+    font-size:13px;
+    color:#475569;
+  }
+
+  .mobile-actions{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+  }
+
+  .mobile-actions button{
+    flex:1;
+  }
+}
+
+/* ===================== MODALES ===================== */
 .modal{
   position:fixed;
   inset:0;
@@ -99,8 +153,11 @@ td{
 .modal-content{
   background:#fff;
   width:520px;
-  padding:30px;
-  border-radius:18px;
+  max-width:92%;
+  max-height:90vh;
+  overflow:auto;
+  padding:20px;
+  border-radius:16px;
 }
 
 input,select{
@@ -115,137 +172,16 @@ input,select{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
-  margin-top:15px;
+  margin-top:12px;
 }
 
 .footer-btns{
-  margin-top:20px;
   display:flex;
   gap:10px;
-  justify-content:flex-end;
+  margin-top:16px;
 }
 
-/* ================= MOBILE ================= */
-.mobile-list{ display:none; }
-
-@media (max-width:768px){
-
-  /* CONTROLES */
-  .controls{
-    flex-direction:column;
-    align-items:stretch;
-  }
-
-  .controls input{
-    width:100%;
-    max-width:100%;
-    min-width:0;
-  }
-
-  /* TABLA */
-  table, thead{ display:none; }
-
-  /* TARJETAS */
-  .mobile-list{
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-  }
-
-  .mobile-card{
-    background:#fff;
-    border-radius:16px;
-    padding:18px;
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-    border:1px solid #e5e7eb;
-  }
-
-  .mobile-card h4{ margin:0 0 6px; }
-  .mobile-card p{ margin:4px 0; font-size:13px; }
-
-  .mobile-actions{
-    display:flex;
-    gap:8px;
-    margin-top:10px;
-  }
-
-  .mobile-actions button{ flex:1; }
-
-  /* ===== MODAL MÓVIL CORREGIDO ===== */
-  .modal{
-    align-items:flex-start;
-    padding:10px;
-  }
-
-  .modal-content{
-    width:100%;
-    max-width:100%;
-    max-height:90vh;              /* 🔑 CLAVE */
-    overflow-y:auto;              /* 🔑 SCROLL INTERNO */
-    padding:16px;                 /* más compacto */
-    border-radius:14px;
-  }
-
-  .modal-content h3,
-  .modal-content h4{
-    margin-top:8px;
-  }
-
-  .permissions{
-    gap:6px;
-    margin-top:10px;
-  }
-
-  .permissions label{
-    font-size:13px;
-  }
-
-  .footer-btns{
-    margin-top:12px;
-    flex-direction:column;
-    gap:8px;
-  }
-
-  .footer-btns button{
-    width:100%;
-    padding:10px;                 /* botones más compactos */
-    font-size:13px;
-  }
-}
-/* ================= MOVIL ================= */
-@media(max-width:768px){
-
-.controls input{
-  width:100%;
-}
-
-table, thead{
-  display:none;
-}
-
-.mobile-list{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.mobile-card{
-  background:#fff;
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-}
-
-.mobile-actions{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
-}
-
-.footer-btns{
-  flex-direction:column;
-}
-}
+.footer-btns button{ flex:1; }
 </style>
 </head>
 
@@ -254,13 +190,15 @@ table, thead{
 <div class="container">
   <div class="card">
 
+    <!-- CONTROLES -->
     <div class="controls">
-      <button id="btnLoad" class="btn-load" onclick="cargarUsuarios()">Cargar usuarios</button>
+      <button id="btnLoad" class="btn-primary" onclick="cargarUsuarios()">Cargar usuarios</button>
       <input id="busqueda" placeholder="Buscar usuario, nombre o rol" oninput="filtrar()">
-      <button class="btn-success" onclick="abrirCrear()">+ Usuario</button>
-      <button class="btn-success" onclick="abrirModulos()">⚙️ Módulos</button>
+      <button class="btn-success" onclick="abrirCrear()">+ Crear Usuario</button>
+      <button class="btn-primary" onclick="abrirModulo()">+ Crear Módulo</button>
     </div>
 
+    <!-- TABLA WEB -->
     <table>
       <thead>
         <tr>
@@ -277,6 +215,7 @@ table, thead{
       </tbody>
     </table>
 
+    <!-- TARJETAS MÓVIL -->
     <div id="mobileList" class="mobile-list"></div>
 
   </div>
@@ -303,24 +242,30 @@ table, thead{
     </select>
 
     <h4>Permisos</h4>
-    <div class="permissions" id="listaPermisos"></div>
+    <div class="permissions">
+      <label><input type="checkbox" value="inventario"> Inventario</label>
+      <label><input type="checkbox" value="etiquetas"> Etiquetas</label>
+      <label><input type="checkbox" value="codigos"> Códigos</label>
+      <label><input type="checkbox" value="dashboard"> Dashboard</label>
+      <label><input type="checkbox" value="usuarios"> Usuarios</label>
+    </div>
 
     <div class="footer-btns">
-      <button class="btn-success" onclick="guardarUsuario()">Guardar</button>
+      <button id="btnGuardar" class="btn-success" onclick="guardarUsuario()">Guardar</button>
       <button class="btn-danger" onclick="cerrarUsuario()">Cancelar</button>
     </div>
   </div>
 </div>
 
-<!-- ================= MODAL MODULOS ================= -->
-<div class="modal" id="modalModulos">
+<!-- ================= MODAL MÓDULO ================= -->
+<div class="modal" id="modalModulo">
   <div class="modal-content">
     <h3>Crear Módulo</h3>
 
-    <input id="m_nombre" placeholder="Nombre">
-    <input id="m_archivo" placeholder="Archivo HTML">
-    <input id="m_icono" placeholder="Icono">
-    <input id="m_permiso" placeholder="Permiso">
+    <input id="m_nombre" placeholder="Nombre del módulo">
+    <input id="m_archivo" placeholder="Archivo HTML (ej: index2.html)">
+    <input id="m_icono" placeholder="Icono (ej: 📋)">
+    <input id="m_permiso" placeholder="Permiso (ej: inventario)">
 
     <select id="m_activo">
       <option value="SI">ACTIVO</option>
@@ -328,79 +273,98 @@ table, thead{
     </select>
 
     <div class="footer-btns">
-      <button class="btn-success" onclick="crearModulo()">Guardar</button>
-      <button class="btn-danger" onclick="cerrarModulos()">Cerrar</button>
+      <button class="btn-success" onclick="guardarModulo()">Guardar</button>
+      <button class="btn-danger" onclick="cerrarModulo()">Cancelar</button>
     </div>
   </div>
 </div>
 
 <script>
+/* ================= CONFIG ================= */
 const API = "https://script.google.com/macros/s/AKfycbzhpjRngwZW2z4d49pUuHtEci23KFxZkETu-SvB5OPPDJpXnqOkc_MchNE-nWYPfAzw/exec";
 let usuarios = [];
-let modulos = [];
 let modo = "crear";
+
+/* ================= SESIÓN ================= */
+(async()=>{
+  const token = localStorage.getItem("token");
+  const ip = localStorage.getItem("ip");
+  if(!token) location.href="login.html";
+  const r = await fetch(API+"?action=verify&token="+token+"&ip="+ip);
+  const d = await r.json();
+  if(!d.valid || d.rol!=="ADMIN"){
+    localStorage.clear();
+    location.href="login.html";
+  }
+})();
 
 /* ================= CARGAR ================= */
 async function cargarUsuarios(){
+  btnLoad.classList.add("loading");
+  btnLoad.innerHTML=`<div class="loader"></div> Cargando`;
+
   const r = await fetch(API+"?action=listarUsuarios");
   const d = await r.json();
   usuarios = d.data || [];
-  renderUsuarios(usuarios);
+  render(usuarios);
+
+  btnLoad.classList.remove("loading");
+  btnLoad.innerHTML="Cargar usuarios";
 }
 
 /* ================= RENDER ================= */
-function renderUsuarios(data){
+function render(data){
   tablaUsuarios.innerHTML="";
   mobileList.innerHTML="";
 
   data.forEach(u=>{
     tablaUsuarios.innerHTML+=`
-    <tr>
-      <td>${u[1]}</td>
-      <td>${u[2]}</td>
-      <td>${u[3]}</td>
-      <td>${u[4]}</td>
-      <td>${u[5]}</td>
-      <td>
-        <button class="btn-edit" onclick="editarUsuario('${u[1]}','${u[2]}','${u[3]}','${u[4]}','${u[5]}','${u[10]}')">Editar</button>
-        <button class="btn-danger" onclick="eliminarUsuario('${u[1]}')">Eliminar</button>
-      </td>
-    </tr>`;
+      <tr>
+        <td>${u[1]}</td>
+        <td>${u[2]}</td>
+        <td>${u[3]}</td>
+        <td>${u[4]}</td>
+        <td>${u[5]}</td>
+        <td>
+          <button class="btn-edit" onclick="editar('${u[1]}','${u[2]}','${u[3]}','${u[4]}','${u[5]}','${u[10]||""}')">Editar</button>
+          <button class="btn-danger" onclick="eliminarUsuario('${u[1]}')">Eliminar</button>
+        </td>
+      </tr>`;
 
     mobileList.innerHTML+=`
-    <div class="mobile-card">
-      <b>${u[1]}</b>
-      <p>Contraseña: ${u[2]}</p>
-      <p>${u[3]} - ${u[4]}</p>
-      <div class="mobile-actions">
-        <button class="btn-edit" onclick="editarUsuario('${u[1]}','${u[2]}','${u[3]}','${u[4]}','${u[5]}','${u[10]}')">Editar</button>
-        <button class="btn-danger" onclick="eliminarUsuario('${u[1]}')">Eliminar</button>
-      </div>
-    </div>`;
+      <div class="mobile-card">
+        <h4>${u[3]}</h4>
+        <p><b>Usuario:</b> ${u[1]}</p>
+        <p><b>Contraseña:</b> ${u[2]}</p>
+        <p><b>Rol:</b> ${u[4]}</p>
+        <div class="mobile-actions">
+          <button class="btn-edit" onclick="editar('${u[1]}','${u[2]}','${u[3]}','${u[4]}','${u[5]}','${u[10]||""}')">Editar</button>
+          <button class="btn-danger" onclick="eliminarUsuario('${u[1]}')">Eliminar</button>
+        </div>
+      </div>`;
   });
 }
 
 /* ================= FILTRO ================= */
 function filtrar(){
   const q = busqueda.value.toLowerCase();
-  renderUsuarios(usuarios.filter(u =>
+  render(usuarios.filter(u =>
     u[1].toLowerCase().includes(q) ||
     u[3].toLowerCase().includes(q) ||
     u[4].toLowerCase().includes(q)
   ));
 }
 
-/* ================= MODALES ================= */
+/* ================= USUARIOS ================= */
 function abrirCrear(){
   modo="crear";
   tituloUsuario.innerText="Crear Usuario";
   u_user.disabled=false;
-  limpiarUsuario();
-  cargarPermisos();
+  limpiar();
   modalUsuario.style.display="flex";
 }
 
-function editarUsuario(u,p,n,r,a,perms){
+function editar(u,p,n,r,a,per){
   modo="editar";
   tituloUsuario.innerText="Editar Usuario";
   u_user.value=u; u_user.disabled=true;
@@ -408,33 +372,23 @@ function editarUsuario(u,p,n,r,a,perms){
   u_nombre.value=n;
   u_rol.value=r;
   u_activo.value=a;
-  cargarPermisos(perms);
+  document.querySelectorAll(".permissions input").forEach(c=>c.checked=per.includes(c.value));
   modalUsuario.style.display="flex";
 }
 
 function cerrarUsuario(){ modalUsuario.style.display="none"; }
-function abrirModulos(){ modalModulos.style.display="flex"; }
-function cerrarModulos(){ modalModulos.style.display="none"; }
 
-/* ================= PERMISOS ================= */
-async function cargarPermisos(selected=""){
-  const r = await fetch(API+"?action=listarModulos");
-  const d = await r.json();
-  modulos = d.data || [];
-  listaPermisos.innerHTML="";
-  modulos.forEach(m=>{
-    listaPermisos.innerHTML+=`
-    <label>
-      <input type="checkbox" value="${m[4]}" ${selected.includes(m[4])?"checked":""}>
-      ${m[1]}
-    </label>`;
-  });
+function limpiar(){
+  u_user.value=""; u_pass.value=""; u_nombre.value="";
+  u_rol.value="ADMIN"; u_activo.value="SI";
+  document.querySelectorAll(".permissions input").forEach(c=>c.checked=false);
 }
 
-/* ================= CRUD ================= */
 async function guardarUsuario(){
-  const perms=[...document.querySelectorAll("#listaPermisos input:checked")]
-    .map(c=>c.value).join(",");
+  btnGuardar.classList.add("loading");
+  btnGuardar.innerHTML=`<div class="loader"></div> Guardando`;
+
+  const permisos=[...document.querySelectorAll(".permissions input:checked")].map(c=>c.value).join(",");
 
   await fetch(API,{
     method:"POST",
@@ -446,25 +400,29 @@ async function guardarUsuario(){
       nombre:u_nombre.value,
       rol:u_rol.value,
       activo:u_activo.value,
-      permisos:perms
+      permisos
     })
   });
 
   cerrarUsuario();
   cargarUsuarios();
+  btnGuardar.classList.remove("loading");
+  btnGuardar.innerHTML="Guardar";
 }
 
 async function eliminarUsuario(u){
   if(!confirm("Eliminar "+u+"?")) return;
-  await fetch(API,{
-    method:"POST",
-    headers:{ "Content-Type":"text/plain" },
+  await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},
     body:JSON.stringify({action:"eliminarUsuario",username:u})
   });
   cargarUsuarios();
 }
 
-async function crearModulo(){
+/* ================= MÓDULOS ================= */
+function abrirModulo(){ modalModulo.style.display="flex"; }
+function cerrarModulo(){ modalModulo.style.display="none"; }
+
+async function guardarModulo(){
   await fetch(API,{
     method:"POST",
     headers:{ "Content-Type":"text/plain" },
@@ -477,9 +435,9 @@ async function crearModulo(){
       activo:m_activo.value
     })
   });
-  cerrarModulos();
+  cerrarModulo();
 }
 </script>
 
 </body>
-</html
+</html>
