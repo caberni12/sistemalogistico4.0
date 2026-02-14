@@ -33,6 +33,9 @@ body{
  padding:16px;
 }
 
+
+
+
 /* ================== HEADER ================== */
 .topbar{margin-bottom:12px}
 
@@ -204,17 +207,34 @@ td.fecha{
  box-shadow:0 6px 18px #0001;
  margin-bottom:12px
 }
-.row-actions{
- display:flex;
- gap:10px;
- margin-top:10px
+
+
+
+/* ===== FIX DEFINITIVO ACCIONES ===== */
+td .actions{
+  display:flex !important;
+  flex-direction:row !important;
+  gap:8px;
+  justify-content:center;
+  align-items:center;
+  white-space:nowrap;
 }
-.row-actions button{flex:1}
+
+td .actions button{
+  display:inline-flex !important;
+  width:38px;
+  height:38px;
+  padding:0;
+  border-radius:10px;
+}
+
 
 @media(max-width:768px){
  .table-scroll{display:none}
  .mobile-list{display:block}
 }
+
+
 </style>
 </head>
 
@@ -356,7 +376,9 @@ td.fecha{
   </div>
 </div>
 <script>
-  /* ================== CONFIG ================== */
+  /* ======================================================
+     CONFIGURACIÓN
+  ====================================================== */
   const API = "https://script.google.com/macros/s/AKfycbwUWmmiojyLtGIvVGwQNuld9ONNGWI1SR1sCsk95lSgoaWSCIFQ2q3kEKZidUZjIiM3rw/exec";
   
   let RAW = [];
@@ -365,7 +387,9 @@ td.fecha{
   let charts = {};
   let currentFoto = "";
   
-  /* ================== HELPERS ================== */
+  /* ======================================================
+     HELPERS
+  ====================================================== */
   const isMobile = () => window.matchMedia("(max-width:768px)").matches;
   
   function setLoading(btn, state){
@@ -374,27 +398,44 @@ td.fecha{
     btn.classList.toggle("loading", state);
   }
   
-  /* ================== LOAD ================== */
+  /* ======================================================
+     FECHA (dd-MM-yyyy HH:mm)
+  ====================================================== */
+  function parseFechaCL(str){
+    if(!str) return null;
+    const [f,h] = str.split(" ");
+    const [d,m,y] = f.split("-").map(Number);
+    const [hh=0,mm=0] = (h||"0:0").split(":").map(Number);
+    return new Date(y, m-1, d, hh, mm);
+  }
+  
+  /* ======================================================
+     LOAD
+  ====================================================== */
   async function load(){
     const r = await fetch(API);
     RAW = await r.json();
     applyFilters();
   }
   
-  /* ================== FILTERS ================== */
+  /* ======================================================
+     FILTROS
+  ====================================================== */
   function applyFilters(){
     const q = search.value.toLowerCase();
     const s = fStatus.value;
-    const d1 = fDesde.value ? new Date(fDesde.value) : null;
-    const d2 = fHasta.value ? new Date(fHasta.value) : null;
+  
+    const d1 = fDesde.value ? new Date(fDesde.value+"T00:00:00") : null;
+    const d2 = fHasta.value ? new Date(fHasta.value+"T23:59:59") : null;
   
     FILT = RAW.filter(r=>{
-      const textOK = !q || (r.pedido + r.cliente).toLowerCase().includes(q);
+      const textOK = !q || (r.pedido+r.cliente).toLowerCase().includes(q);
       const statusOK = !s || r.status === s;
   
       let fechaOK = true;
       if(d1 || d2){
-        const fr = new Date(r.fechaIngreso);
+        const fr = parseFechaCL(r.fechaIngreso);
+        if(!fr) return false;
         if(d1 && fr < d1) fechaOK = false;
         if(d2 && fr > d2) fechaOK = false;
       }
@@ -404,7 +445,9 @@ td.fecha{
     render();
   }
   
-  /* ================== RENDER ================== */
+  /* ======================================================
+     RENDER
+  ====================================================== */
   function render(){
     renderKPIs();
     tbody.innerHTML = "";
@@ -417,10 +460,10 @@ td.fecha{
           <b>${r.pedido}</b> · ${r.status}<br>
           ${r.cliente}<br>
           ${r.direccion} (${r.comuna})<br>
-          🚚 ${r.transporte || ""}<br>
-          📦 ${r.etiquetas || 0}<br>
-          👤 ${r.responsable || ""}<br>
-          ⏱ ${r.horaEntrega || ""}<br><br>
+          🚚 ${r.transporte||""}<br>
+          📦 ${r.etiquetas||0}<br>
+          👤 ${r.responsable||""}<br>
+          ⏱ ${r.horaEntrega||""}<br><br>
           ${renderFotos(r.foto)}
           <div class="row-actions">
             <button onclick="openMap('${r.direccion}','${r.comuna}')">📍</button>
@@ -433,34 +476,37 @@ td.fecha{
       FILT.forEach(r=>{
         tbody.innerHTML += `
         <tr>
-          <td>${r.fechaIngreso || ""}</td>
+          <td class="fecha">${r.fechaIngreso||""}</td>
           <td>${r.pedido}</td>
           <td>${r.cliente}</td>
           <td>${r.direccion}</td>
           <td>${r.comuna}</td>
-          <td>${r.transporte || ""}</td>
-          <td>${r.etiquetas || 0}</td>
-          <td>${r.observaciones || ""}</td>
+          <td>${r.transporte||""}</td>
+          <td>${r.etiquetas||0}</td>
+          <td>${r.observaciones||""}</td>
           <td>${r.status}</td>
-          <td>${r.responsable || ""}</td>
-          <td>${r.horaEntrega || ""}</td>
+          <td>${r.responsable||""}</td>
+          <td>${r.horaEntrega||""}</td>
           <td>${renderFotos(r.foto)}</td>
           <td>
-            <button onclick="openMap('${r.direccion}','${r.comuna}')">📍</button>
-            <button onclick="openModal(RAW.find(x=>x._row==${r._row}))">✏️</button>
-            <button onclick="delRow(${r._row})">🗑️</button>
+            <div class="actions">
+              <button onclick="openMap('${r.direccion}','${r.comuna}')">📍</button>
+              <button onclick="openModal(RAW.find(x=>x._row==${r._row}))">✏️</button>
+              <button onclick="delRow(${r._row})">🗑️</button>
+            </div>
           </td>
         </tr>`;
       });
     }
   }
   
-  /* ================== FOTOS ================== */
+  /* ======================================================
+     FOTOS
+  ====================================================== */
   function renderFotos(f){
     if(!f) return "";
-    const arr = Array.isArray(f) ? f : String(f).split("|");
-    return arr.map(url=>`
-      <img src="${url}" class="foto-thumb" onclick="openFoto('${url}')">
+    return String(f).split("|").map(u=>`
+      <img src="${u}" class="foto-thumb" onclick="openFoto('${u}')">
     `).join("");
   }
   
@@ -468,8 +514,8 @@ td.fecha{
     currentFoto = url;
     fotoGrande.src = url;
     fotoModal.style.display = "flex";
-    enableZoom();
   }
+  
   btnCerrarFoto.onclick = ()=> fotoModal.style.display="none";
   
   btnDescargarFoto.onclick = ()=>{
@@ -479,29 +525,23 @@ td.fecha{
     a.click();
   };
   
-  /* ================== ZOOM FOTO ================== */
-  function enableZoom(){
-    let scale = 1;
-    fotoGrande.onwheel = e=>{
-      e.preventDefault();
-      scale += e.deltaY * -0.001;
-      scale = Math.min(Math.max(1,scale),4);
-      fotoGrande.style.transform = `scale(${scale})`;
-    };
-  }
-  
-  /* ================== MAPA ================== */
+  /* ======================================================
+     MAPA
+  ====================================================== */
   function openMap(d,c){
     mapFrame.src =
-     `https://www.google.com/maps?q=${encodeURIComponent(d+', '+c+', Chile')}&output=embed`;
+      `https://www.google.com/maps?q=${encodeURIComponent(d+', '+c+', Chile')}&output=embed`;
     mapModal.style.display="flex";
   }
+  
   btnCerrarMapa.onclick = ()=>{
     mapModal.style.display="none";
     mapFrame.src="";
   };
   
-  /* ================== KPIs ================== */
+  /* ======================================================
+     KPIS
+  ====================================================== */
   function drawKPI(id,val,total,color){
     if(charts[id]) charts[id].destroy();
     charts[id] = new Chart(document.getElementById(id),{
@@ -514,6 +554,7 @@ td.fecha{
   function renderKPIs(){
     const t = FILT.length || 1;
     const c = s => FILT.filter(r=>r.status===s).length;
+  
     kpis.innerHTML = `
       <div class="kpi"><canvas id="k1"></canvas><b>${t}</b><br>Total</div>
       <div class="kpi"><canvas id="k2"></canvas><b>${c("PENDIENTE")}</b><br>Pend</div>
@@ -521,6 +562,7 @@ td.fecha{
       <div class="kpi"><canvas id="k4"></canvas><b>${c("ENTREGADO")}</b><br>Ent</div>
       <div class="kpi"><canvas id="k5"></canvas><b>${c("RECIBIDO")}</b><br>Rec</div>
       <div class="kpi"><canvas id="k6"></canvas><b>${c("CANCELADO")}</b><br>Can</div>`;
+  
     drawKPI("k1",t,t,"#14b8a6");
     drawKPI("k2",c("PENDIENTE"),t,"#facc15");
     drawKPI("k3",c("EN RUTA"),t,"#38bdf8");
@@ -529,13 +571,16 @@ td.fecha{
     drawKPI("k6",c("CANCELADO"),t,"#ef4444");
   }
   
-  /* ================== MODAL CRUD ================== */
+  /* ======================================================
+     CRUD
+  ====================================================== */
   btnNuevo.onclick = ()=> openModal();
   btnCancelar.onclick = ()=> modalForm.style.display="none";
   
   function openModal(r=null){
     modalForm.style.display="flex";
     EDIT = r;
+  
     if(r){
       mtitle.textContent="Editar Pedido";
       mPedido.value=r.pedido;
@@ -548,7 +593,7 @@ td.fecha{
       mStatus.value=r.status;
       mResponsable.value=r.responsable||"";
       mHoraEntrega.value=r.horaEntrega||"";
-    }else{
+    } else {
       mtitle.textContent="Nuevo Pedido";
       mPedido.value=mCliente.value=mDireccion.value=mComuna.value=mTransporte.value=mObs.value="";
       mCajas.value=1;
@@ -557,28 +602,31 @@ td.fecha{
     }
   }
   
-  /* ================== SAVE ================== */
+  /* ======================================================
+     GUARDAR
+  ====================================================== */
   btnGuardar.onclick = async ()=>{
     setLoading(btnGuardar,true);
-    let foto64 = "";
-    if(mFotos.files[0]){
-      foto64 = await toBase64(mFotos.files[0]);
-    }
-    const payload = {
-      action: EDIT ? "update" : "add",
-      row: EDIT ? EDIT._row : null,
-      "PEDIDO": mPedido.value,
-      "CLIENTE": mCliente.value,
-      "DIRECCION": mDireccion.value,
-      "COMUNA": mComuna.value,
-      "TRANSPORTE": mTransporte.value,
-      "ETIQUETAS": mCajas.value,
-      "OBSERVACIONES": mObs.value,
-      "STATUS": mStatus.value,
-      "RESPONSABLE ENTREGA": mResponsable.value,
-      "HORA ENTREGA": mHoraEntrega.value,
-      "FOTO": foto64
+  
+    let foto64="";
+    if(mFotos.files[0]) foto64 = await toBase64(mFotos.files[0]);
+  
+    const payload={
+      action: EDIT?"update":"add",
+      row: EDIT?EDIT._row:null,
+      "PEDIDO":mPedido.value,
+      "CLIENTE":mCliente.value,
+      "DIRECCION":mDireccion.value,
+      "COMUNA":mComuna.value,
+      "TRANSPORTE":mTransporte.value,
+      "ETIQUETAS":mCajas.value,
+      "OBSERVACIONES":mObs.value,
+      "STATUS":mStatus.value,
+      "RESPONSABLE ENTREGA":mResponsable.value,
+      "HORA ENTREGA":mHoraEntrega.value,
+      "FOTO":foto64
     };
+  
     await fetch(API,{method:"POST",body:JSON.stringify(payload)});
     setLoading(btnGuardar,false);
     modalForm.style.display="none";
@@ -593,15 +641,20 @@ td.fecha{
     });
   }
   
-  /* ================== DELETE ================== */
+  /* ======================================================
+     ELIMINAR
+  ====================================================== */
   async function delRow(row){
     if(!confirm("¿Eliminar pedido?")) return;
     await fetch(API,{method:"POST",body:JSON.stringify({action:"delete",row})});
     load();
   }
   
-  /* ================== EXPORT ================== */
-  btnPDF.onclick = ()=> exportPDF(btnPDF);
+  /* ======================================================
+     EXPORTES
+  ====================================================== */
+   /* ================== EXPORT ================== */
+   btnPDF.onclick = ()=> exportPDF(btnPDF);
   btnExcel.onclick = ()=> exportExcel(btnExcel);
   /* ================== EXPORT PDF ================== */
 function exportPDF(btn){
@@ -707,14 +760,18 @@ function exportExcel(btn){
 }
 
   
-  /* ================== INIT ================== */
-  search.oninput = applyFilters;
-  fStatus.onchange = applyFilters;
-  fDesde.onchange = applyFilters;
-  fHasta.onchange = applyFilters;
+  
+  /* ======================================================
+     INIT
+  ====================================================== */
+  search.oninput=applyFilters;
+  fStatus.onchange=applyFilters;
+  fDesde.onchange=applyFilters;
+  fHasta.onchange=applyFilters;
   
   load();
-  </script> 
+  </script>
+   <script src="segurity.js"></script>
+
   </body>
- <script src="segurity.js"></script>
   </html>
