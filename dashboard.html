@@ -301,6 +301,41 @@ td .actions button{
   }
 }
 
+/* ================= KPI TOCABLE ================= */
+.kpi{
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease, background .15s;
+  user-select:none;
+}
+
+.kpi:active{
+  transform:scale(0.97);
+}
+
+.kpi:hover{
+  box-shadow:0 6px 16px rgba(0,0,0,.15);
+}
+
+/* KPI activo (filtro aplicado) */
+.kpi.active{
+  outline:3px solid #2563eb;
+  background:#eff6ff;
+}
+
+/* Texto */
+.kpi b{
+  font-size:18px;
+  display:block;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width:768px){
+  .kpi{
+    padding:16px 12px;
+  }
+}
+
+
 
 
 </style>
@@ -619,18 +654,49 @@ td .actions button{
     });
   }
   
+function kpiFilter(status){
+  // marcar activo
+  document.querySelectorAll('.kpi').forEach(k=>k.classList.remove('active'));
+  const active = [...document.querySelectorAll('.kpi')]
+    .find(k=>k.dataset.status===status);
+  if(active) active.classList.add('active');
+
+  // aplicar filtro
+  fStatus.value = status;
+  applyFilters();
+}
+
+
   function renderKPIs(){
     const t = FILT.length || 1;
     const c = s => FILT.filter(r=>r.status===s).length;
   
     kpis.innerHTML = `
-      <div class="kpi"><canvas id="k1"></canvas><b>${t}</b><br>Total</div>
-      <div class="kpi"><canvas id="k2"></canvas><b>${c("PENDIENTE")}</b><br>Pendiente</div>
-      <div class="kpi"><canvas id="k3"></canvas><b>${c("EN RUTA")}</b><br>Ruta</div>
-      <div class="kpi"><canvas id="k4"></canvas><b>${c("ENTREGADO")}</b><br>Entregado</div>
-      <div class="kpi"><canvas id="k5"></canvas><b>${c("RECIBIDO")}</b><br>Recibido</div>
-      <div class="kpi"><canvas id="k6"></canvas><b>${c("CANCELADO")}</b><br>Cancelado</div>`;
-  
+  <div class="kpi" onclick="kpiFilter('')" data-status="">
+    <canvas id="k1"></canvas><b>${t}</b>Total
+  </div>
+
+  <div class="kpi" onclick="kpiFilter('PENDIENTE')" data-status="PENDIENTE">
+    <canvas id="k2"></canvas><b>${c("PENDIENTE")}</b>Pendiente
+  </div>
+
+  <div class="kpi" onclick="kpiFilter('EN RUTA')" data-status="EN RUTA">
+    <canvas id="k3"></canvas><b>${c("EN RUTA")}</b>Ruta
+  </div>
+
+  <div class="kpi" onclick="kpiFilter('ENTREGADO')" data-status="ENTREGADO">
+    <canvas id="k4"></canvas><b>${c("ENTREGADO")}</b>Entregado
+  </div>
+
+  <div class="kpi" onclick="kpiFilter('RECIBIDO')" data-status="RECIBIDO">
+    <canvas id="k5"></canvas><b>${c("RECIBIDO")}</b>Recibido
+  </div>
+
+  <div class="kpi" onclick="kpiFilter('CANCELADO')" data-status="CANCELADO">
+    <canvas id="k6"></canvas><b>${c("CANCELADO")}</b>Cancelado
+  </div>
+`;
+
     drawKPI("k1",t,t,"#14b8a6");
     drawKPI("k2",c("PENDIENTE"),t,"#facc15");
     drawKPI("k3",c("EN RUTA"),t,"#38bdf8");
