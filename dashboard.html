@@ -366,6 +366,22 @@ td .actions button{
 }
 
 
+ /* ================= CURSOR TABLA ================= */
+tr.cursor-active{
+  background:#e0f2fe !important;
+}
+
+tr.cursor-active td{
+  border-top:1px solid #38bdf8;
+  border-bottom:1px solid #38bdf8;
+}
+
+/* hover normal sigue funcionando */
+tbody tr:hover{
+  background:#f1f5f9;
+}
+
+
 /* ================= MOBILE ================= */
 @media (max-width:768px){
   .kpi{
@@ -536,7 +552,8 @@ td .actions button{
   let EDIT = null;
   let charts = {};
   let currentFoto = "";
-  
+  let cursorIndex = -1;
+
   /* ======================================================
      HELPERS
   ====================================================== */
@@ -599,7 +616,8 @@ td .actions button{
      RENDER
   ====================================================== */
   function render(){
-    renderKPIs();
+   cursorIndex = -1;
+   renderKPIs();
     tbody.innerHTML = "";
     mobileList.innerHTML = "";
   
@@ -650,7 +668,48 @@ td .actions button{
     }
   }
   
-  /* ======================================================
+ function moveCursor(dir){
+  const rows = [...tbody.querySelectorAll("tr")];
+  if(!rows.length) return;
+
+  // quitar activo
+  rows.forEach(r=>r.classList.remove("cursor-active"));
+
+  // calcular índice
+  cursorIndex += dir;
+  if(cursorIndex < 0) cursorIndex = 0;
+  if(cursorIndex >= rows.length) cursorIndex = rows.length - 1;
+
+  const row = rows[cursorIndex];
+  row.classList.add("cursor-active");
+
+  // scroll automático
+  row.scrollIntoView({
+    behavior:"smooth",
+    block:"nearest"
+  });
+}
+
+ 
+ document.addEventListener("keydown", e=>{
+  if(isMobile()) return;            // solo escritorio
+  if(modalForm.style.display==="flex") return; // no interferir modal
+
+  if(e.key === "ArrowDown"){
+    e.preventDefault();
+    moveCursor(1);
+  }
+
+  if(e.key === "ArrowUp"){
+    e.preventDefault();
+    moveCursor(-1);
+  }
+});
+
+ 
+ 
+ 
+ /* ======================================================
      FOTOS
   ====================================================== */
   function renderFotos(f){
