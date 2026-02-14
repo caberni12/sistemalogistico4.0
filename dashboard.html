@@ -557,11 +557,11 @@ td .actions button{
   
     kpis.innerHTML = `
       <div class="kpi"><canvas id="k1"></canvas><b>${t}</b><br>Total</div>
-      <div class="kpi"><canvas id="k2"></canvas><b>${c("PENDIENTE")}</b><br>Pend</div>
+      <div class="kpi"><canvas id="k2"></canvas><b>${c("PENDIENTE")}</b><br>Pendiente</div>
       <div class="kpi"><canvas id="k3"></canvas><b>${c("EN RUTA")}</b><br>Ruta</div>
-      <div class="kpi"><canvas id="k4"></canvas><b>${c("ENTREGADO")}</b><br>Ent</div>
-      <div class="kpi"><canvas id="k5"></canvas><b>${c("RECIBIDO")}</b><br>Rec</div>
-      <div class="kpi"><canvas id="k6"></canvas><b>${c("CANCELADO")}</b><br>Can</div>`;
+      <div class="kpi"><canvas id="k4"></canvas><b>${c("ENTREGADO")}</b><br>Entregado</div>
+      <div class="kpi"><canvas id="k5"></canvas><b>${c("RECIBIDO")}</b><br>Recibido</div>
+      <div class="kpi"><canvas id="k6"></canvas><b>${c("CANCELADO")}</b><br>Cancelado</div>`;
   
     drawKPI("k1",t,t,"#14b8a6");
     drawKPI("k2",c("PENDIENTE"),t,"#facc15");
@@ -771,7 +771,6 @@ function exportExcel(btn){
   
   load();
   </script>
-   <script src="segurity.js"></script>
-
+  
   </body>
   </html>
