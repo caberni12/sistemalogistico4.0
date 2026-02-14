@@ -589,28 +589,47 @@ tbody tr:hover{
      FILTROS
   ====================================================== */
   function applyFilters(){
-    const q = search.value.toLowerCase();
-    const s = fStatus.value;
-  
-    const d1 = fDesde.value ? new Date(fDesde.value+"T00:00:00") : null;
-    const d2 = fHasta.value ? new Date(fHasta.value+"T23:59:59") : null;
-  
-    FILT = RAW.filter(r=>{
-      const textOK = !q || (r.pedido+r.cliente).toLowerCase().includes(q);
-      const statusOK = !s || r.status === s;
-  
-      let fechaOK = true;
-      if(d1 || d2){
-        const fr = parseFechaCL(r.fechaIngreso);
-        if(!fr) return false;
-        if(d1 && fr < d1) fechaOK = false;
-        if(d2 && fr > d2) fechaOK = false;
-      }
-      return textOK && statusOK && fechaOK;
-    });
-  
-    render();
+
+const q = search.value.toLowerCase().trim();
+const s = fStatus.value;
+
+const d1 = fDesde.value ? new Date(fDesde.value + "T00:00:00") : null;
+const d2 = fHasta.value ? new Date(fHasta.value + "T23:59:59") : null;
+
+FILT = RAW.filter(r => {
+
+  /* ========= NORMALIZAR CAMPOS ========= */
+  const pedido   = String(r.pedido ?? '').toLowerCase();
+  const cliente  = String(r.cliente ?? '').toLowerCase();
+  const obs      = String(r.observaciones ?? '').toLowerCase();
+  const status   = String(r.status ?? '');
+  const fechaStr = r.fechaIngreso ?? null;
+
+  /* ========= TEXTO ========= */
+  const textOK = !q || (
+    pedido.includes(q) ||
+    cliente.includes(q) ||
+    obs.includes(q)
+  );
+
+  /* ========= STATUS ========= */
+  const statusOK = !s || status === s;
+
+  /* ========= FECHA ========= */
+  let fechaOK = true;
+  if(d1 || d2){
+    const fr = parseFechaCL(fechaStr);
+    if(!fr) return false;
+    if(d1 && fr < d1) fechaOK = false;
+    if(d2 && fr > d2) fechaOK = false;
   }
+
+  return textOK && statusOK && fechaOK;
+});
+
+cursorIndex = -1;   // reset cursor
+render();
+}
   
   /* ======================================================
      RENDER
