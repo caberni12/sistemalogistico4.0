@@ -328,6 +328,44 @@ td .actions button{
   display:block;
 }
 
+
+ /* ================= TOGGLE DASHBOARD ================= */
+.btn-kpi-toggle{
+  background:#2563eb;
+  color:#fff;
+  border:none;
+  padding:10px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:14px;
+  margin-bottom:12px;
+}
+
+.btn-kpi-toggle:active{
+  transform:scale(.96);
+}
+
+/* contenedor KPIs */
+#kpis{
+  transition: max-height .35s ease, opacity .25s ease, margin .25s;
+  overflow:hidden;
+}
+
+/* oculto */
+#kpis.hidden{
+  max-height:0;
+  opacity:0;
+  margin:0;
+  pointer-events:none;
+}
+
+/* visible */
+#kpis:not(.hidden){
+  max-height:600px; /* suficiente para KPIs */
+  opacity:1;
+}
+
+
 /* ================= MOBILE ================= */
 @media (max-width:768px){
   .kpi{
@@ -336,6 +374,7 @@ td .actions button{
 }
 
 
+ 
 
 
 </style>
@@ -379,7 +418,15 @@ td .actions button{
     <span class="btn-text">📊 Excel</span>
     <span class="btn-loader"></span>
   </button>
-</div>
+
+<button id="btnToggleKPI" class="btn-kpi-toggle">
+  📊 Ocultar dashboard
+</button>
+
+ 
+ 
+ 
+ div>
 
 <!-- ================== TABLA DESKTOP ================== -->
 <div class="table-scroll" tabindex="0">
@@ -664,6 +711,25 @@ function kpiFilter(status){
   // aplicar filtro
   fStatus.value = status;
   applyFilters();
+}
+const btnToggleKPI = document.getElementById('btnToggleKPI');
+
+btnToggleKPI.onclick = ()=>{
+  kpis.classList.toggle('hidden');
+
+  const hidden = kpis.classList.contains('hidden');
+  btnToggleKPI.textContent = hidden
+    ? '📊 Mostrar dashboard'
+    : '📊 Ocultar dashboard';
+
+  // guardar estado
+  localStorage.setItem('kpiHidden', hidden ? '1' : '0');
+};
+
+// restaurar estado
+if(localStorage.getItem('kpiHidden') === '1'){
+  kpis.classList.add('hidden');
+  btnToggleKPI.textContent = '📊 Mostrar dashboard';
 }
 
 
