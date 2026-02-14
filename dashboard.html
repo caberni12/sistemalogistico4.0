@@ -252,6 +252,56 @@ td .actions button{
   font-size:16px;
 }
 
+/* ================= DASHBOARD / KPIs ================= */
+#kpis{
+  display:grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap:12px;
+  margin-bottom:16px;
+}
+
+/* Tarjeta KPI */
+.kpi{
+  background:#fff;
+  border-radius:12px;
+  padding:12px 8px;
+  text-align:center;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+}
+
+/* Canvas centrado */
+.kpi canvas{
+  width:90px !important;
+  height:90px !important;
+  margin:auto;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width:768px){
+
+  /* 👉 2 columnas reales en móvil */
+  #kpis{
+    grid-template-columns: repeat(2, 1fr);
+    gap:14px;
+  }
+
+  /* KPI más ancho y cómodo */
+  .kpi{
+    padding:14px 10px;
+  }
+
+  .kpi b{
+    font-size:18px;
+    display:block;
+    margin-top:4px;
+  }
+
+  .kpi br{
+    display:none;
+  }
+}
+
+
 
 </style>
 </head>
